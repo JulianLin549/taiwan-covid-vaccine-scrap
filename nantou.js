@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-const url = "https://netreg.kln.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=0196&Date=&Noon"
+const url = "https://netreg01.nant.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=0220&Date=&Noon="
 
 const getData = async () => {
     // Viewport && Window size
@@ -22,7 +22,6 @@ const getData = async () => {
         },
     })
 
-    // const context = browser.defaultBrowserContext();
     let page = await browser.newPage();
     await page.setViewport({ width: width, height: height });
 
@@ -36,26 +35,22 @@ const getData = async () => {
     for (let weekIndex = 1; weekIndex <= weeksEl.length; weekIndex++) {
         await frame.waitForSelector('#UpdatePanel1');
         const week = await frame.$(`#RdBtnLstWeek > input:nth-of-type(${weekIndex})`);
-        week.click()
-        await page.waitForTimeout(200);
+        await week.click();
+        await page.waitForTimeout(800);
         await frame.waitForSelector('#SchTable1');
         const daysEl = await frame.$$('#SchTable1 > tbody > tr.trRegSchHead > td');
         for (let dayIndex = 2; dayIndex <= daysEl.length; dayIndex++) {
 
             const dayTimeEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchHead > td:nth-of-type(${dayIndex})`);
-            let date = await dayTimeEl.evaluate(el => el.innerHTML.split("<")[0]);//06/08星期二
-            // let parts = date.split('/');
-            // date = new Date(2021, parseInt(parts[0], 10)-1, parseInt(parts[1], 10));
+            let date = await dayTimeEl.evaluate(el => el.innerText);
             const timeSlotEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchDay > td:nth-child(1)`);
-            const morningEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchDay > td:nth-of-type(${dayIndex}) > span:nth-of-type(2)`);
-            const afternoonEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchMiddle > td:nth-of-type(${dayIndex}) > span:nth-of-type(2)`);
-            const nightEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchNight > td:nth-of-type(${dayIndex}) > span:nth-of-type(2)`);
-
-            for await (let [i, timePeriodEl] of [morningEl, afternoonEl, nightEl].entries()){
-
+            const morningEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchDay > td:nth-of-type(${dayIndex}) > span:nth-of-type(3)`);
+            const afternoonEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchMiddle > td:nth-of-type(${dayIndex}) > span:nth-of-type(3)`);
+            const nightEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchNight > td:nth-of-type(${dayIndex}) > span:nth-of-type(3)`);
+            for await (let timePeriodEl of [morningEl, afternoonEl, nightEl]){
                 if(timePeriodEl !== null) {
                     const innerText = await timePeriodEl.evaluate(el => el.innerText);
-                    if(innerText.match(/\([0-9]+\)/gi)) {
+                    if(!innerText.match("網掛不開放") && innerText.match(/\([0-9]+\)/gi)) {
                         const availability = innerText.match(/[0-9]+/gi);
                         const timeSlot = await timeSlotEl.evaluate(el => el.innerText);
                         data.push({ date, timeSlot, availability })

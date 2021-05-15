@@ -1,7 +1,5 @@
 const puppeteer = require('puppeteer');
-
-
-const baseUrl = "https://reg.ntuh.gov.tw/WebAdministration/VaccineRegPublic.aspx?Hosp=T0&Reg=";
+const baseUrl = "https://reg.ntuh.gov.tw/WebAdministration/VaccineRegPublic.aspx?Hosp=Y0&Reg=";
 
 const getData = async () => {
     // Viewport && Window size
@@ -35,11 +33,10 @@ const getData = async () => {
         const availabilityEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(1)`);
         const dateAndTimeSlotEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(3)`);
         const availability = await availabilityEl.evaluate(el => el.innerText);
+
         if (!availability.match("名額已滿")) {
             const dateAndTimeSlot = await dateAndTimeSlotEl.evaluate(el => el.innerText);
             const date = dateAndTimeSlot.split(" ")[0];
-            // parts[0] = String(parseInt(parts[0], 10) + 1911);
-            // const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10)-1, parseInt(parts[2], 10));
             const timeSlot = dateAndTimeSlot.split(') ')[1];
             data.push({ date, timeSlot  })
         }

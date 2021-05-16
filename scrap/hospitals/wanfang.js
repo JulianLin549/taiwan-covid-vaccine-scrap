@@ -2,27 +2,12 @@ const puppeteer = require('puppeteer');
 
 const baseUrl = "https://www.wanfang.gov.tw/p3_register_e3.aspx?deptcode=B055&depttype=A&deptdesc=%E8%87%AA%E8%B2%BBCOVID-19%E7%96%AB%E8%8B%97%E9%96%80%E8%A8%BA&depttype2=A";
 
-const getData = async () => {
+const getData = async (browser) => {
 
-    const width = 1375;
-    const height = 800;
     const data = [];
 
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-            `--window-size=${ width },${ height }`,
-            '--disable-features=site-per-process',
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-        defaultViewport: {
-            width,
-            height
-        },
-    })
+
     let page = await browser.newPage();
-    await page.setViewport({ width: width, height: height });
 
     await page.goto(baseUrl);
     await page.waitForSelector('#ContentPlaceHolder1_DataPager1 > input:nth-last-child(-n+2)')
@@ -55,7 +40,8 @@ const getData = async () => {
 
     }
 
-    await browser.close();
+    await page.waitForTimeout(process.env.DELAY_TIME);
+    await page.close();
     return data;
 }
 

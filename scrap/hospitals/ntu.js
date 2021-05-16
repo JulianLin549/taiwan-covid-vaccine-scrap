@@ -3,29 +3,10 @@ const puppeteer = require('puppeteer');
 
 const baseUrl = "https://reg.ntuh.gov.tw/WebAdministration/VaccineRegPublic.aspx?Hosp=T0&Reg=";
 
-const getData = async () => {
-    // Viewport && Window size
-    const width = 1375;
-    const height = 800;
-    const data = [];
-
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-            `--window-size=${ width },${ height }`,
-            '--disable-features=site-per-process',
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-        defaultViewport: {
-            width,
-            height
-        },
-    })
-
+const getData = async (browser) => {
 
     let page = await browser.newPage();
-    await page.setViewport({ width: width, height: height });
+    const data = [];
 
     await page.goto(baseUrl);
     await page.waitForSelector('#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList');
@@ -45,7 +26,8 @@ const getData = async () => {
         }
     }
 
-    await browser.close();
+    await page.waitForTimeout(process.env.DELAY_TIME);
+    await page.close();
     return data;
 }
 

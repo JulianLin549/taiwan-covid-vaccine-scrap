@@ -34,7 +34,7 @@ const getData = async (browser) => {
             }
         }
 
-        console.log(data)
+        console.log("羅東聖母醫院:", data)
         await page.waitForTimeout(process.env.DELAY_TIME);
         await page.close();
         await saveToDb("羅東聖母醫院", data);

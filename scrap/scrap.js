@@ -27,8 +27,19 @@ const tunyuan = require('./hospitals/tunyuan')
 const go = async () => {
     const width = 1375;
     const height = 800;
-
-    const browser = await puppeteer.launch({
+    const headless = {
+        headless: true,
+        args: [
+            '--incognito',
+            '--disable-features=site-per-process',
+            '--no-sandbox',
+            '--single-process',
+            '--no-zygote',
+            '--disable-setuid-sandbox'
+        ],
+        defaultViewport: null,
+    };
+    const normal = {
         headless: false,
         args: [
             `--window-size=${width},${height}`,
@@ -40,24 +51,31 @@ const go = async () => {
             width,
             height
         },
-    })
-    // const browser = await puppeteer.launch({
-    //     headless: true,
-    //     args: [
-    //         '--incognito',
-    //         '--disable-features=site-per-process',
-    //         '--no-sandbox',
-    //         '--single-process',
-    //         '--no-zygote',
-    //         '--disable-setuid-sandbox'
-    //     ],
-    //     defaultViewport: null,
-    // })
+    }
+//==========================================================================================
+//check for run time set-up
+//==========================================================================================
+    const {PerformanceObserver, performance} = require('perf_hooks');
+    const obs = new PerformanceObserver((items) => {
+        console.log('PerformanceObserver A to B', (items.getEntries()[0].duration/1000).toFixed(4), '(s)');
+        performance.clearMarks();
+    });
+    obs.observe({entryTypes: ['measure']});
+    performance.mark('A');
+//==========================================================================================
+//check for run time start
+//==========================================================================================
+
+
+
+    const browser = await puppeteer.launch(headless);
+
+
     try {
 
         await Promise.all([
             //keelung(browser),
-            macKay(browser),
+            // macKay(browser),
             // ntu(browser),
             // wanfang(browser),
             // taipeiMed(browser),
@@ -66,10 +84,10 @@ const go = async () => {
             // taoyuan(browser),
             // ntuHsinchu(browser),
             // tunyuan(browser),
-            // miaoli(browser),
-            // taichung(browser),
+            miaoli(browser),
+            //taichung(browser),
             // puliChris(browser),
-            // nantou(browser),
+            nantou(browser),
             // ntuYunlin(browser),
             // stMartin(browser),
             // chiayiChangGung(browser),
@@ -78,10 +96,21 @@ const go = async () => {
             // ksUnited(browser),
             // pintungChris(browser),
             // hualienTzuchi(browser),
-            // taitung(browser),
+            //taitung(browser),
             //kinmen(browser)
         ])
         await browser.close();
+
+        //==========================================================================================
+        //check for run time end
+        //==========================================================================================
+        console.log('\n')
+        console.log('==========================================================================================')
+        console.log("||                  Finish scraping hospital vaccine vacancy                            ||")
+        console.log("||                           Process Complete!                                          ||")
+        console.log('=========================================================================================')
+        performance.mark('B');
+        performance.measure('A to B', 'A', 'B');
     } catch (e) {
         console.log(e);
         await browser.close();

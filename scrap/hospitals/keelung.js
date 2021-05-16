@@ -56,7 +56,7 @@ const getData = async (browser) => {
                 }
             }
         }
-        console.log(data)
+        console.log("衛生福利部基隆醫院:", data)
         await page.waitForTimeout(process.env.DELAY_TIME);
         await page.close();
         await saveToDb("衛生福利部基隆醫院", data);

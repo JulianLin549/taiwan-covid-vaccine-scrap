@@ -1,31 +1,14 @@
 const puppeteer = require('puppeteer');
+const saveToDb = require('../saveToDb');
+
 const baseUrls = [
     "https://app.tzuchi.com.tw/tchw/opdreg/OpdTimeShow.aspx?Depart=%E8%87%AA%E8%B2%BBCOVID19%E7%96%AB%E8%8B%97%E9%A0%90%E7%B4%84&HospLoc=3",
 ];
 
-const getData = async () => {
-    // Viewport && Window size
-    const width = 1375;
-    const height = 800;
-    const data = [];
-
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-            `--window-size=${width},${height}`,
-            '--disable-features=site-per-process',
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-        defaultViewport: {
-            width,
-            height
-        },
-    })
-
-
+const getData = async (browser) => {
+    let data = [];
     let page = await browser.newPage();
-    await page.setViewport({width: width, height: height});
+    try {
 
     for await(baseUrl of baseUrls) {
         await page.goto(baseUrl);
@@ -49,9 +32,14 @@ const getData = async () => {
             }
         }
     }
-
-    await browser.close();
-    return data;
+        console.log("佛教慈濟醫療財團法人花蓮慈濟醫院:", data)
+        await page.waitForTimeout(process.env.DELAY_TIME);
+        await page.close();
+        await saveToDb("佛教慈濟醫療財團法人花蓮慈濟醫院:", data);
+    } catch (e) {
+        await page.close();
+        console.log(e.message);
+    }
 }
 
 

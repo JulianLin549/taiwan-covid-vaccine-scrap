@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const saveToDb = require('../saveToDb');
 
-const url = "https://netreg.kmhp.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=1010&Date=&Noon="
+const url = "https://netreg.kmhp.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=104A&Date=&Noon="
 
 const getData = async (browser) => {
     let data = [];
@@ -57,7 +57,7 @@ const getData = async (browser) => {
                 }
             }
         }
-        console.log(data)
+        console.log("衛生福利部金門醫院:", data);
         await page.waitForTimeout(process.env.DELAY_TIME);
         await page.close();
         await saveToDb("衛生福利部金門醫院", data);

@@ -1,49 +1,40 @@
 const puppeteer = require('puppeteer');
+const saveToDb = require('../saveToDb');
+
+
 const baseUrl = "https://reg.ntuh.gov.tw/WebAdministration/VaccineRegPublic.aspx?Hosp=Y0&Reg=";
 
-const getData = async () => {
-    // Viewport && Window size
-    const width = 1375;
-    const height = 800;
-    const data = [];
+const getData = async (browser) => {
 
-    const browser = await puppeteer.launch({
-        headless: false,
-        args: [
-            `--window-size=${ width },${ height }`,
-            '--disable-features=site-per-process',
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-        defaultViewport: {
-            width,
-            height
-        },
-    })
-
-
+    let data = [];
     let page = await browser.newPage();
-    await page.setViewport({ width: width, height: height });
 
-    await page.goto(baseUrl);
-    await page.waitForSelector('#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList');
-    const rowsEl = await page.$$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr`);
+    try {
 
-    for (let index = 2; index <= rowsEl.length; index++) {
-        const availabilityEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(1)`);
-        const dateAndTimeSlotEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(3)`);
-        const availability = await availabilityEl.evaluate(el => el.innerText);
+        await page.goto(baseUrl);
+        await page.waitForSelector('#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList');
+        const rowsEl = await page.$$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr`);
 
-        if (!availability.match("名額已滿")) {
-            const dateAndTimeSlot = await dateAndTimeSlotEl.evaluate(el => el.innerText);
-            const date = dateAndTimeSlot.split(" ")[0];
-            const timeSlot = dateAndTimeSlot.split(') ')[1];
-            data.push({ date, timeSlot  })
+        for (let index = 2; index <= rowsEl.length; index++) {
+            const availabilityEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(1)`);
+            const dateAndTimeSlotEl = await page.$(`#DoctorServiceListInSeveralDays1_GridViewDoctorServiceList > tbody > tr:nth-child(${index}) > td:nth-child(3)`);
+            const availability = await availabilityEl.evaluate(el => el.innerText);
+
+            if (!availability.match("名額已滿") && !availability.match("停止掛號")) {
+                const dateAndTimeSlot = await dateAndTimeSlotEl.evaluate(el => el.innerText);
+                const date = dateAndTimeSlot.split(" ")[0];
+                const timeSlot = dateAndTimeSlot.split(') ')[1];
+                data.push({date, timeSlot})
+            }
         }
+        console.log("國立臺灣大學醫學院附設醫院雲林分院:", data);
+        await page.waitForTimeout(process.env.DELAY_TIME);
+        await page.close();
+        await saveToDb("國立臺灣大學醫學院附設醫院雲林分院", data);
+    } catch (e) {
+        await page.close();
+        console.log(e.message);
     }
-
-    await browser.close();
-    return data;
 }
 
 module.exports = getData;

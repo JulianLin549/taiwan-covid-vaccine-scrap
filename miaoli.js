@@ -50,7 +50,7 @@ const getData = async () => {
                     if(timePeriodEl !== null) {
                         const innerText = await timePeriodEl.evaluate(el => el.innerText);
                         if(innerText.match(/\([0-9]+\)/gi)) {
-                            const availability = innerText.match(/[0-9]+/gi);
+                            const availability = innerText.match(/[0-9]+/gi)[0];
                             const timeSlot = await timeSlotEl.evaluate(el => el.innerText);
                             data.push({ date, timeSlot, availability })
                         }

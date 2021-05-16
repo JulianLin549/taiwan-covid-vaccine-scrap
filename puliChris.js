@@ -34,7 +34,7 @@ const getData = async () => {
     for await (rowEl of rowsEl) {
         const row = await rowEl.evaluate(el => el.innerText);
         if(!row.match(/\(額滿\)/gi)){
-            const date = row.match(/\d+\/\d+\/\d+\([一二三四五六日]\)/gi);
+            const date = row.match(/\d+\/\d+\/\d+\([一二三四五六日]\)/gi)[0];
             const timeSlot = row.match(/早上|下午/gi);
             data.push({ date, timeSlot })
         }

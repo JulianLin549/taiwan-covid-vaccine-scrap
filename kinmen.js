@@ -49,11 +49,10 @@ const getData = async () => {
             const nightEl = await frame.$(`#SchTable1 > tbody > tr.trRegSchNight > td:nth-of-type(${dayIndex}) > span:nth-of-type(2)`);
 
             for await (let timePeriodEl of [morningEl, afternoonEl, nightEl]){
-                console.log(date)
                 if(timePeriodEl !== null) {
                     const innerText = await timePeriodEl.evaluate(el => el.innerText);
                     if(innerText.match(/\([0-9]+\)/gi)) {
-                        const availability = innerText.match(/[0-9]+/gi);
+                        const availability = innerText.match(/[0-9]+/gi)[0];
                         const timeSlot = await timeSlotEl.evaluate(el => el.innerText);
                         data.push({ date, timeSlot, availability })
                     }

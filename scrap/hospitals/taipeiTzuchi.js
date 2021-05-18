@@ -1,5 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://reg-prod.tzuchi-healthcare.org.tw/tchw/HIS5OpdReg/OpdTimeShow?Pass=XD;0022";
 
@@ -7,6 +8,7 @@ const getData = async (browser) => {
 
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
 
     try {
         await page.goto(baseUrl);

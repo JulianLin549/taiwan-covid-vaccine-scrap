@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://netreg.smh.org.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=FK&Date=&Noon=";
 
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
         await page.goto(baseUrl);

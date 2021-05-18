@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const keelung = require('./hospitals/keelung');
 const macKay = require('./hospitals/macKay');
 const ntu = require('./hospitals/ntu');
@@ -23,29 +23,52 @@ const ksUnited = require('./hospitals/ksUnited')
 const hualienTzuchi = require('./hospitals/hualienTzuchi')
 const pintungChris = require('./hospitals/pintungChris')
 const tunyuan = require('./hospitals/tunyuan')
+const saveLastUpdateTime = require("./saveLastUpdateTime");
+const Hospital = require("../model/hospital");
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const proxys = require('./proxys.json');
+puppeteer.use(StealthPlugin());
 
 const go = async () => {
+
+    let init = await Hospital.findOne({name: "default"});
+    if (init) {
+        let previousUpdatedAt = init.updatedAt;
+        let timeDiff = Math.abs(Date.now() - previousUpdatedAt);
+        let timeDiffMin = Math.ceil(timeDiff / (1000 * 60)); //minutes
+        if (timeDiffMin <= 10) {
+           // throw new Error(`still ${10 - timeDiffMin} minutes till next scrap can process`)
+        }
+    }
+    console.log("scraping .... ")
+
+
     const width = 1375;
     const height = 800;
     const headless = {
         headless: true,
+        ignoreHTTPSErrors: true,
         args: [
             '--incognito',
             '--disable-features=site-per-process',
             '--no-sandbox',
             '--single-process',
             '--no-zygote',
-            '--disable-setuid-sandbox'
+            '--disable-setuid-sandbox',
+            '--proxy-server=${}',
+            '--ignore-certificate-errors',
         ],
         defaultViewport: null,
     };
     const normal = {
         headless: false,
+        ignoreHTTPSErrors: true,
         args: [
             `--window-size=${width},${height}`,
             '--disable-features=site-per-process',
             '--no-sandbox',
-            '--disable-setuid-sandbox'
+            '--disable-setuid-sandbox',
+            //`--proxy-server=${proxys[0]}`,
         ],
         defaultViewport: {
             width,
@@ -57,7 +80,7 @@ const go = async () => {
 //==========================================================================================
     const {PerformanceObserver, performance} = require('perf_hooks');
     const obs = new PerformanceObserver((items) => {
-        console.log('PerformanceObserver A to B', (items.getEntries()[0].duration/1000).toFixed(4), '(s)');
+        console.log('PerformanceObserver A to B', (items.getEntries()[0].duration / 1000).toFixed(4), '(s)');
         performance.clearMarks();
     });
     obs.observe({entryTypes: ['measure']});
@@ -66,41 +89,37 @@ const go = async () => {
 //check for run time start
 //==========================================================================================
 
-
-
-    const browser = await puppeteer.launch(headless);
-
-
+    const browser = await puppeteer.launch(normal);
     try {
 
         await Promise.all([
-            //keelung(browser),
-            // macKay(browser),
-            // ntu(browser),
-            // wanfang(browser),
-            // taipeiMed(browser),
-            // taipeiTzuchi(browser),
-            //loudongStMary(browser),
-            // taoyuan(browser),
-            // ntuHsinchu(browser),
-            // tunyuan(browser),
+            ntu(browser),
+            keelung(browser),
+            macKay(browser),
+            wanfang(browser),
+            taipeiMed(browser),
+            taipeiTzuchi(browser),
+            loudongStMary(browser),
+            taoyuan(browser),
+            ntuHsinchu(browser),
+            tunyuan(browser),
             miaoli(browser),
-            //taichung(browser),
-            // puliChris(browser),
+            taichung(browser),
+            puliChris(browser),
             nantou(browser),
-            // ntuYunlin(browser),
-            // stMartin(browser),
-            // chiayiChangGung(browser),
-            // chengKung(browser),
-            // xiaoKang(browser),
-            // ksUnited(browser),
-            // pintungChris(browser),
-            // hualienTzuchi(browser),
-            //taitung(browser),
-            //kinmen(browser)
+            ntuYunlin(browser),
+            stMartin(browser),
+            chiayiChangGung(browser),
+            chengKung(browser),
+            xiaoKang(browser),
+            ksUnited(browser),
+            pintungChris(browser),
+            hualienTzuchi(browser),
+            taitung(browser),
+            kinmen(browser)
         ])
         await browser.close();
-
+        await saveLastUpdateTime()
         //==========================================================================================
         //check for run time end
         //==========================================================================================
@@ -114,6 +133,7 @@ const go = async () => {
     } catch (e) {
         console.log(e);
         await browser.close();
+        await saveLastUpdateTime()
     }
 
 }

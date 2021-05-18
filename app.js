@@ -8,8 +8,8 @@ const mongoose = require('mongoose');
 const app = express();
 
 
-const mongooseConnection = async () => {
-    try{
+(async () => {
+    try {
         await mongoose.connect(process.env.DATABASE_URL, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
@@ -17,20 +17,23 @@ const mongooseConnection = async () => {
             useCreateIndex: true
         });
         console.log('MongoDB Connected...');
+
+
     } catch (error) {
         throw new Error('connection broke');
     }
 
-}
-mongooseConnection();
+})();
 
 app.get('/scrap', (req, res) => {
-
-    scrap();
+    try {
+        scrap();
+    } catch(e) {
+        console.log(e.message)
+    }
     res.status(200).send("success");
+
 });
-
-
 
 
 app.get('/:else', (req, res) => {

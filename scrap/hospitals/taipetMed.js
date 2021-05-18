@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://www.tmuh.org.tw/service/regist/016/week/";
 
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
         for (let i = 0; i < 5; i++) {
             await page.goto(baseUrl + i);

@@ -1,5 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const urls = ["https://reg2.mil.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=CO11&Date=&Noon=",
     "https://reg2.mil.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=CO41&Date=&Noon=",
@@ -9,11 +10,11 @@ const urls = ["https://reg2.mil.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.a
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
-
+    await saveRandom(page);
     try {
 
         for await (url of urls) {
-            await page.waitForTimeout(100);
+            await page.waitForTimeout(Math.random() * (700 - 100) + 100);
             await page.goto(url);
             await page.waitForSelector('#ctl00_ContentPlaceHolder1_iframeRegTable');
             const frame = await page.frames().find(frame => frame.name() === 'iframeRegTable');

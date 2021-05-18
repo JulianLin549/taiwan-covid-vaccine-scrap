@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://w3.tyh.com.tw/WebRegList_Dept.aspx?d=55";
 
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
         await page.goto(baseUrl);

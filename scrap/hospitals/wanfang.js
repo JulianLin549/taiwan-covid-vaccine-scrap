@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://www.wanfang.gov.tw/p3_register_e3.aspx?deptcode=B055&depttype=A&deptdesc=%E8%87%AA%E8%B2%BBCOVID-19%E7%96%AB%E8%8B%97%E9%96%80%E8%A8%BA&depttype2=A";
 
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
         await page.goto(baseUrl);

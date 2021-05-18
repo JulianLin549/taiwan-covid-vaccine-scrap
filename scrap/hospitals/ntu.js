@@ -1,5 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 
 const baseUrl = "https://reg.ntuh.gov.tw/WebAdministration/VaccineRegPublic.aspx?Hosp=T0&Reg=";
@@ -8,7 +9,7 @@ const getData = async (browser) => {
 
     let data = [];
     let page = await browser.newPage();
-
+    await saveRandom(page);
     try {
 
         await page.goto(baseUrl);

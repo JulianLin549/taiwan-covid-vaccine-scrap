@@ -1,5 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrls = [
     "https://reg.kmuh.gov.tw/netReg/MainUI.aspx?DeptCodeId=1A&Lang=&RoomCnt=2&TimeRange=1&Name=%E6%96%B0%E5%86%A0%E8%82%BA%E7%82%8E%E7%96%AB%E8%8B%97",
@@ -8,6 +9,7 @@ const baseUrls = [
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
         for await(baseUrl of baseUrls) {

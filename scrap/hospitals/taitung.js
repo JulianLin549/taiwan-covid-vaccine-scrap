@@ -1,11 +1,13 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const url = "https://netreg01.tait.mohw.gov.tw/OINetReg/OINetReg.Reg/Reg_RegTable.aspx?HID=F&Way=Dept&DivDr=0119&Date=&Noon="
 
 const getData = async (browser) => {
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
         await page.goto(url);
@@ -23,12 +25,12 @@ const getData = async (browser) => {
             const week = await frame.$(`#RdBtnLstWeek > input:nth-of-type(${weekIndex})`);
             await week.click();
 
-            let countdown = 1000; //1000 * 10 = 10 sec
+            let countdown = 1000; //1000 * 100 = 100 sec
             while (previousDate === currentDate) {
                 if (countdown <= 0) {
                     throw Error("countdown exceed")
                 }
-                page.waitForTimeout(10);
+                page.waitForTimeout(500);
                 currentDate = await frame.$eval(`#SchTable1 > tbody > tr.trRegSchHead > td:nth-child(2)`, el => el.textContent);
                 countdown -= 1
             }

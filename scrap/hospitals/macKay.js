@@ -1,5 +1,6 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const saveToDb = require('../saveToDb');
+const saveRandom = require("../setRandom");
 
 const baseUrl = "https://www.mmh.org.tw/register_single_doctor.php?depid=75&drcode=O75K";
 
@@ -7,9 +8,16 @@ const getData = async (browser) => {
     // Viewport && Window size
     let data = [];
     let page = await browser.newPage();
+    await saveRandom(page);
     try {
 
-        await page.goto(baseUrl);
+        // await page.goto(baseUrl);
+        // Configure the navigation timeout
+        await page.goto(baseUrl, {
+            waitUntil: 'load',
+            // Remove the timeout
+            timeout: 0
+        });
         await page.waitForSelector('#tblSch');
         const dateColumnsEl = await page.$$(`#tblSch > tbody:nth-child(2) > tr`);
 

@@ -55,7 +55,6 @@ const go = async () => {
             '--single-process',
             '--no-zygote',
             '--disable-setuid-sandbox',
-            '--proxy-server=${}',
             '--ignore-certificate-errors',
         ],
         defaultViewport: null,
@@ -68,7 +67,7 @@ const go = async () => {
             '--disable-features=site-per-process',
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            //`--proxy-server=${proxys[0]}`,
+            // `--proxy-server=${proxys[0]}`,
         ],
         defaultViewport: {
             width,
@@ -89,7 +88,7 @@ const go = async () => {
 //check for run time start
 //==========================================================================================
 
-    const browser = await puppeteer.launch(normal);
+    const browser = await puppeteer.launch(headless);
     try {
 
         await Promise.all([

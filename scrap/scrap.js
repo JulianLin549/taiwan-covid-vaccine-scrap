@@ -37,7 +37,7 @@ const go = async () => {
         let timeDiff = Math.abs(Date.now() - previousUpdatedAt);
         let timeDiffMin = Math.ceil(timeDiff / (1000 * 60)); //minutes
         if (timeDiffMin <= 10) {
-           // throw new Error(`still ${10 - timeDiffMin} minutes till next scrap can process`)
+            throw new Error(`still ${10 - timeDiffMin} minutes till next scrap can process`)
         }
     }
     console.log("scraping .... ")

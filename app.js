@@ -24,6 +24,10 @@ const app = express();
     }
 
 })();
+app.get('/', (req, res) => {
+    res.send("main page")
+})
+
 
 app.get('/scrap', (req, res) => {
     try {
